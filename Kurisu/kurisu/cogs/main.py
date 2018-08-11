@@ -26,7 +26,15 @@ class Amadeus:
 
 	@cog.command(pass_context=True)
 	async def reload(self, ctx, ext: str):
-		"""Перезагружает зубец"""
+		"""Перезагружает зубец
+
+		Аргументы:
+		-----------
+		ext: `str`
+			Название зубца.
+			Формат:
+				- `kurisu.cogs.<имя>` / `<имя>`
+		"""
 		if ctx.message.author.id != "185459415514742784" :
 			return
 		importlib.invalidate_caches()
@@ -39,7 +47,6 @@ class Amadeus:
 						ext = 'kurisu.cogs.%s' % ext
 					else:
 						ext = 'kurisu.%s' % ext
-			
 			self.bot.unload_extension(ext)
 			self.bot.load_extension(ext)
 		except (AttributeError, ImportError) as e:
@@ -50,7 +57,15 @@ class Amadeus:
 
 	@cog.command(pass_context=True)
 	async def load(self, ctx, ext: str):
-		"""Подключает зубец"""
+		"""Подключает зубец
+
+		Аргументы:
+		-----------
+		ext: `str`
+			Название зубца.
+			Формат:
+				- `kurisu.cogs.<имя>` / `<имя>`
+		"""
 		if ctx.message.author.id != "185459415514742784" :
 			return
 		importlib.invalidate_caches()
@@ -73,7 +88,15 @@ class Amadeus:
 
 	@cog.command(pass_context=True)
 	async def unload(self, ctx, ext: str):
-		"""Отключает зубец"""
+		"""Отключает зубец
+
+		Аргументы:
+		-----------
+		ext: `str`
+			Название зубца.
+			Формат:
+				- `kurisu.cogs.<имя>` / `<имя>`
+		"""
 		if ctx.message.author.id != "185459415514742784" :
 			return
 
@@ -107,7 +130,15 @@ class Amadeus:
 
 	@module.command(pass_context=True, name="import")
 	async def module_import(self, ctx, module: str):
-		"""Импортирует модуль"""
+		"""Импортирует модуль
+
+		Аргументы:
+		-----------
+		module: `str`
+			Название модуля.
+			Формат:
+				- `kurisu.<имя>` / `<имя>`
+		"""
 		if ctx.message.author.id != "185459415514742784" :
 			return
 		importlib.invalidate_caches()
@@ -165,7 +196,15 @@ class Amadeus:
 
 	@module.command(pass_context=True)
 	async def reimport(self, ctx, module: str):
-		"""Перезагружает модуль"""
+		"""Перезагружает модуль
+
+		Аргументы:
+		-----------
+		module: `str`
+			Название модуля.
+			Формат:
+				- `kurisu.<имя>` / `<имя>`
+		"""
 		if ctx.message.author.id != "185459415514742784" :
 			return
 		importlib.invalidate_caches()
@@ -267,7 +306,15 @@ class Amadeus:
 
 	@module.command(pass_context=True, name="del")
 	async def module_del(self, ctx, module: str):
-		"""Выгружает модуль"""
+		"""Выгружает модуль
+
+		Аргументы:
+		-----------
+		module: `str`
+			Название модуля.
+			Формат:
+				- `kurisu.<имя>` / `<имя>`
+		"""
 		if ctx.message.author.id != "185459415514742784" :
 			return
 		importlib.invalidate_caches()
@@ -376,7 +423,15 @@ class Amadeus:
 
 	@task.command(pass_context=True)
 	async def create(self, ctx, task: str):
-		"""Создает задачу"""
+		"""Создает задачу
+
+		Аргументы:
+		-----------
+		task: `str`
+			Название задачи.
+			Формат:
+				- `kurisu.<модуль>.<имя>`
+		"""
 		if ctx.message.author.id != "185459415514742784" :
 			return
 		
@@ -398,7 +453,15 @@ class Amadeus:
 
 	@task.command(pass_context=True)
 	async def cancel(self, ctx, task: str):
-		"""Отменяет задачу"""
+		"""Отменяет задачу
+
+		Аргументы:
+		-----------
+		task: `str`
+			Название задачи.
+			Формат:
+				- `kurisu.<модуль>.<имя>`
+		"""
 		if ctx.message.author.id != "185459415514742784" :
 			return
 

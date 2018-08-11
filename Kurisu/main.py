@@ -14,12 +14,13 @@ client = commands.Bot(command_prefix='!', description='Amadeus Systems', formatt
 ready = False
 taskList = {}
 
+
 def sigint_handler(sig, frame):
 	req = requests.post(webhook, json={'embeds': [{'color': '15158332', 'title': 'Процесс `Amadeus` был закрыт.', 'description': 'Причина: Keyboard Interrupt'}]})
 	sys.exit(0)
 
 signal.signal(signal.SIGINT, sigint_handler)
-  
+
 @client.event
 async def on_ready():
 	print('[Discord] | Initializing tips')
@@ -37,7 +38,7 @@ async def on_ready():
 	desc = '{u.mention} готова к работе'.format(u=client.user)
 	req = requests.post(webhook, json={'embeds': [{'color': '3066993', 'title': 'Процесс `Amadeus` запущен.', 'description': desc}]})
 	ready = True
-	
+
 # Тут начинаются команды
 
 if __name__ == "__main__":
