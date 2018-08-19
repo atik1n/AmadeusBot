@@ -2,8 +2,10 @@ discordToken = "<token>"
 webhook = '<url>'
 
 import discord, asyncio, urllib.request, os.path, sqlite3, copy, time, datetime
-import kurisu.nyaa, kurisu.console, kurisu.tips, kurisu.override, kurisu.alpaca, kurisu.prefs, kurisu.tasks
-import traceback, requests, signal, sys
+
+import kurisu.nyaa, kurisu.tips, kurisu.override, kurisu.alpaca, kurisu.prefs, kurisu.tasks
+import traceback
+
 from discord.ext import commands
 
 startup_extensions = ["kurisu.cogs.steins", "kurisu.cogs.upa", "kurisu.cogs.fgl", "kurisu.cogs.main"]
@@ -23,18 +25,8 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 @client.event
 async def on_ready():
-	print('[Discord] | Initializing tips')
-	kurisu.tips.init()
-	print('[Discord] | Initializing preferences')
-	kurisu.prefs.init()
-	kurisu.prefs.discordClient = client
-	print('[Discord] | Logged in as: %s | %s' % (client.user.name, client.user.id))
-	await client.change_presence(game=discord.Game(name='Steins;Gate 0', type=3))
-	kurisu.tasks.loop = client.loop
-	await kurisu.tasks.new(kurisu.nyaa.fetch)
-	await kurisu.tasks.new(kurisu.alpaca.alpacaLoop)
-	kurisu.prefs.startup = datetime.datetime.now()
 	global ready
+
 	desc = '{u.mention} готова к работе'.format(u=client.user)
 	req = requests.post(webhook, json={'embeds': [{'color': '3066993', 'title': 'Процесс `Amadeus` запущен.', 'description': desc}]})
 	ready = True
