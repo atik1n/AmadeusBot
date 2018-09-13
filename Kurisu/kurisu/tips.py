@@ -17,7 +17,7 @@ def unif(s):
 
 
 def init():
-	with open('tips0.txt', 'r') as f:
+	with open('tips0.txt', 'r', encoding='utf-8') as f:
 		tmp = [row.strip() for row in f]
 		for i in range(len(tmp)//3):
 			k_ru[0].append(unif(tmp[i*3]))
@@ -25,7 +25,7 @@ def init():
 			k_eng[0].append(unif(tmp[i*3+1]))
 			tips[0].append(tmp[i*3+2])
 
-	with open('tips.txt', 'r') as f:
+	with open('tips.txt', 'r', encoding='utf-8') as f:
 		tmp = [row.strip() for row in f]
 		for i in range(len(tmp)//3):
 			k_ru[1].append(unif(tmp[i*3]))
