@@ -11,9 +11,9 @@ class Events:
 			# return
 
 		if message.content == 'Nullpo':
-			await self.bot.send_message(message.channel, 'Gah!')
+			await message.channel.send('Gah!')
 
-	async def on_command_error(self, error: Exception, ctx: commands.Context):
+	async def on_command_error(self, ctx, error):
 		ignored = (commands.CommandNotFound, commands.UserInputError)
 
 		if isinstance(error, ignored):
@@ -24,33 +24,16 @@ class Events:
 		tmpEmbed.add_field(name="Вызвал", value=ctx.message.author.mention)
 		tmpEmbed.add_field(name="Сообщение", value=ctx.message.content)
 		tmpEmbed.add_field(name="Traceback", value='%s%s' % (''.join(tb[:5]), ''.join(tb[-1])))
-		await self.bot.send_message(kurisu.prefs.Channels.log, embed=tmpEmbed)
+		await kurisu.prefs.Channels.get('log').send(embed=tmpEmbed)
 
 		if isinstance(error, commands.BadArgument):
-			await self.bot.send_message(ctx.message.channel, 'Ошибка в аргументе')
+			await ctx.message.channel.send('Ошибка в аргументе')
 			return
 		elif isinstance(error, commands.MissingRequiredArgument):
-			await self.bot.send_message(ctx.message.channel, 'Недостаточно аргументов')
+			await ctx.message.channel.send('Недостаточно аргументов')
 			return
 		else:
-			await self.bot.send_message(ctx.message.channel, 'Упс... Информация об ошибке в %s' % kurisu.prefs.Channels.log.mention)
-
-	async def on_error(self, event, error: Exception, *args, **kwargs):
-		print('Mew')
-		tmpEmbed = kurisu.prefs.Embeds.new('error')
-		tb = traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__, limit=5)
-		tmpEmbed.add_field(name="Вызвал", value=event)
-
-		argsF = ['[%s] %s' % (i, val) for i, val in args]
-		argsF = (len(argsF) == 0) and '*Нет*' or '\n'.join(argsF)
-		kwargsF = ['[%s] %s' % (i, kwargs[i]) for i in kwargs]
-		kwargsF = (len(kwargsF) == 0) and '*Нет*' or '\n'.join(kwargsF)
-
-		tmpEmbed.add_field(name="Позиционные аргументы:", value=argsF, inline=True)
-		tmpEmbed.add_field(name="Именованные аргументы:", value=kwargsF, inline=True)
-
-		tmpEmbed.add_field(name="Traceback", value='%s%s' % (''.join(tb[:5]), ''.join(tb[-1])))
-		await self.bot.send_message(kurisu.prefs.Channels.log, embed=tmpEmbed)
+			await ctx.message.channel.send('Упс... Информация об ошибке в %s' % kurisu.prefs.Channels.log.mention)
 
 
 def setup(bot):

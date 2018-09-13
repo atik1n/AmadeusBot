@@ -1,7 +1,7 @@
 from discord.ext import commands
 import datetime, sqlite3
 import kurisu.prefs
-import kurisu.tasks
+import salieri.tasks
 
 
 def unixTime(dt):
@@ -14,16 +14,16 @@ class Upa:
 	def __init__(self, bot):
 		self.bot = bot
 
-	@commands.group(pass_context=True)
+	@commands.group()
 	async def alpaca(self, ctx):
 		"""Временный мут"""
-		if not ctx.message.author.server_permissions.view_audit_logs:
-			await self.bot.say("Ты не можешь это сделать, ты не модератор/администратор.")
+		if not kurisu.prefs.Channels.get('lab').permissions_for(ctx.author).view_audit_log:
+			await ctx.send("Ты не можешь это сделать, ты не модератор/администратор.")
 			return
 		if ctx.invoked_subcommand is None:
-			await self.bot.say('У `!alpaca` нет подкоманды %s. Посмотри `!help alpaca`.' % ctx.subcommand_passed)
+			await ctx.send('У `!alpaca` нет подкоманды %s. Посмотри `!help alpaca`.' % ctx.subcommand_passed)
 
-	@alpaca.command(pass_context=True)
+	@alpaca.command()
 	async def add(self, ctx, user: str, *time: str):
 		"""Делает пользователя Альпакаменом
 
@@ -37,12 +37,12 @@ class Upa:
 			Формат: "??s ??m ??h" или "??с ??м ??ч". Пожалуйста, не используйте их вместе.
 			Интересный факт. 2 года ~ 17520 часов.
 		"""
-		if not ctx.message.author.server_permissions.view_audit_logs:
+		user = user.replace('!', '')
+		if not kurisu.prefs.Channels.get('lab').permissions_for(ctx.author).view_audit_log:
 			return
-
-		u = ctx.message.server.get_member(user[2:-1])
-		if kurisu.prefs.Roles.alpaca in u.roles:
-			await self.bot.say("%s и так Альпакамен." % u.mention)
+		u = ctx.guild.get_member(int(user[2:-1]))
+		if kurisu.prefs.Roles.get('alpaca') in u.roles:
+			await ctx.send("%s и так Альпакамен." % u.mention)
 			return
 
 		now = datetime.datetime.now()
@@ -62,27 +62,27 @@ class Upa:
 				if end >= now + datetime.timedelta(hours=17520):
 					end = now + datetime.timedelta(hours=17520)
 				else:
-					if not 'kurisu.alpaca.alpacaLoop' in kurisu.tasks.allTasks:
-						await self.bot.say("Я не могу это сделать, так как задача `alpaca.alpacaLoop` не запущена. Прости.")
+					if not 'kurisu.alpaca.alpacaLoop' in salieri.tasks.allTasks:
+						await ctx.send("Я не могу это сделать, так как задача `alpaca.alpacaLoop` не запущена. Прости.")
 						return
 
 				if end < now + datetime.timedelta(minutes=2):
 					end = now + datetime.timedelta(minutes=2)
 		except:
-			await self.bot.say("%s, ты точно указал время ЧИСЛАМИ?" % ctx.message.author.mention)
+			await ctx.send("%s, ты точно указал время ЧИСЛАМИ?" % ctx.message.author.mention)
 			return
 
 		conn = sqlite3.connect('db.sqlite3')
 		cursor = conn.cursor()
 		cursor.execute('insert into alpaca (userID, date) values (%s, %s)' % (u.id, unixTime(end)))
-		await self.bot.add_roles(u, kurisu.prefs.Roles.alpaca)
+		await u.add_roles(kurisu.prefs.Roles.get('alpaca'))
 		pt = kurisu.prefs.parse_time(end.timetuple())
 		pt = '%s %s' % (pt[0], pt[1])
-		await self.bot.say("%s стал Альпакаменом до *%s (МСК)*." % (u.mention, pt))
+		await ctx.send("%s стал Альпакаменом до *%s (МСК)*." % (u.mention, pt))
 		conn.commit()
 		conn.close()
 
-	@alpaca.command(pass_context=True)
+	@alpaca.command()
 	async def remove(self, ctx, *users: str):
 		"""Делает Альпакамена пользователем
 		
@@ -91,17 +91,17 @@ class Upa:
 		users : [`discord.Member`]
 			Массив упоминаний Альпакаменов. Не ID. Не ников. Именно упоминаний.
 		"""
-		if not ctx.message.author.server_permissions.view_audit_logs:
+		if not kurisu.prefs.Channels.get('lab').permissions_for(ctx.author).view_audit_log:
 			return
 		conn = sqlite3.connect('db.sqlite3')
 		cursor = conn.cursor()
 		for u in ctx.message.mentions:
-			if not (kurisu.prefs.Roles.alpaca in u.roles):
-				await self.bot.say("%s и так просто пользователь." % u.mention)
+			if not (kurisu.prefs.Roles.get('alpaca') in u.roles):
+				await ctx.send("%s и так просто пользователь." % u.mention)
 				return
 			cursor.execute('delete from alpaca where userID = %s' % u.id)
-			await self.bot.remove_roles(u, kurisu.prefs.Roles.alpaca)
-			await self.bot.say("%s больше не Альпакамен." % u.mention)
+			await u.remove_roles(kurisu.prefs.Roles.get('alpaca'))
+			await ctx.send("%s больше не Альпакамен." % u.mention)
 		conn.commit()
 		conn.close()
 

@@ -2,8 +2,8 @@ import asyncio, datetime, sqlite3
 from math import floor
 import kurisu.prefs
 
-ibn = kurisu.prefs.Channels.dev
-alpacaRole = kurisu.prefs.Roles.alpaca
+ibn = kurisu.prefs.Channels.get('dev')
+alpacaRole = kurisu.prefs.Roles.get('alpaca')
 
 
 async def alpacaLoop():
@@ -18,9 +18,9 @@ async def alpacaLoop():
 			u = s.get_member(dealp[1])
 			try:
 				await client.remove_roles(u, alpacaRole)
-				await client.send_message(ibn, "%s больше не Альпакамен." % u.mention)
+				await ibn.send_message(ibn, "%s больше не Альпакамен." % u.mention)
 			except:
-				await client.send_message(ibn, "Пользователь с ID %s покинул сервер до снятия роли." % dealp[1])
+				await ibn.send_message(ibn, "Пользователь с ID %s покинул сервер до снятия роли." % dealp[1])
 			dealp = [False, '']
 			conn.commit()
 

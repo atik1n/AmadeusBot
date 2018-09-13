@@ -1,5 +1,6 @@
 import re, os
 from discord.ext import commands
+import discord
 import kurisu.prefs
 import datetime, sqlite3
 
@@ -36,7 +37,7 @@ class FGL:
 
 		# help by itself just lists our own commands.
 		if len(cmd) == 0:
-			helpEmbed = bot.formatter.format_help_for(ctx, bot)
+			helpEmbed = await bot.formatter.format_help_for(ctx, bot)
 		elif len(cmd) == 1:
 			# try to see if it is a cog name
 			name = _mention_pattern.sub(repl, cmd[0])
@@ -46,15 +47,15 @@ class FGL:
 			else:
 				command = bot.commands.get(name)
 				if command is None:
-					await bot.send_message(destination, "Команда %s не найдена." % name)
+					await destination.send("Команда %s не найдена." % name)
 					return
 
-			helpEmbed = bot.formatter.format_help_for(ctx, command)
+			helpEmbed = await bot.formatter.format_help_for(ctx, command)
 		else:
 			name = _mention_pattern.sub(repl, cmd[0])
 			command = bot.commands.get(name)
 			if command is None:
-				await bot.send_message(destination, "Команда %s не найдена." % name)
+				await destination.send("Команда %s не найдена." % name)
 				return
 
 			for key in cmd[1:]:
@@ -62,35 +63,29 @@ class FGL:
 					key = _mention_pattern.sub(repl, key)
 					command = command.commands.get(key)
 					if command is None:
-						await bot.send_message(destination, "Подкоманда %s не найдена." % key)
+						await destination.send("Подкоманда %s не найдена." % key)
 						return
 				except AttributeError:
-					await bot.send_message(destination, "Команда %s не имеет подкоманд." % name)
+					await destination.send("Команда %s не имеет подкоманд." % name)
 					return
 
-			helpEmbed = bot.formatter.format_help_for(ctx, command)
+			helpEmbed = await bot.formatter.format_help_for(ctx, command)
 
-		if bot.pm_help is None:
-			characters = sum(map(lambda l: len(l), pages))
-			# modify destination based on length of pages.
-			if characters > 1000:
-				destination = ctx.message.author
-
-		await bot.send_message(destination, embed=helpEmbed)
+		await destination.send(embed=helpEmbed)
 
 	@commands.command()
-	async def status(self):
+	async def status(self, ctx):
 		"""Возвращает информацию о хост-машине"""
 		stats = kurisu.prefs.info()
 
 		emb = kurisu.prefs.Embeds.new('normal')
-		emb.add_field(name = 'Статистика', value='CPU: {d[0]}%\nRAM Total: {d[1]}MB\nRAM Used: {d[2]}MB\nTemp: {d[4]}`C\nUptime: {d[5]}'.format(d=stats))
+		emb.add_field(name='Статистика', value='CPU: {d[0]}%\nRAM Total: {d[1]}MB\nRAM Used: {d[2]}MB\nTemp: {d[4]}`C\nUptime: {d[5]}'.format(d=stats))
 
-		emb.add_field(name = 'Моэка', value='Кэш: %s' % cache_size())
+		emb.add_field(name='Моэка', value='Кэш: %s' % cache_size())
 
-		await self.bot.say(embed = emb)
+		await ctx.send(embed=emb)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def info(self, ctx, *users: str):
 		"""Возвращает информацию о пользователе
 
@@ -107,7 +102,9 @@ class FGL:
 
 		for u in users:
 			emb = kurisu.prefs.Embeds.new('normal')
-			emb.colour = u.colour
+			norole = u.top_role.name == "@everyone"
+			color = (255, 255, 255) if norole else u.colour.to_rgb()
+			emb.colour = discord.Colour.from_rgb(*color)
 			emb.title = '%s%s%s' % (u,  "" if (u.name == u.display_name) else (" a.k.a %s" % u.display_name), u.bot and " [BOT]" or '')
 			emb.add_field(name="ID:", value=u.id, inline=False)
 			embDays = (datetime.datetime.now() - u.joined_at).days
@@ -151,9 +148,8 @@ class FGL:
 				return res
 
 			emb.add_field(name="На сервере:", value=dateParse(embDays), inline=False)
-			r, g, b = u.top_role.colour.to_tuple()
-			emb.add_field(name="Основная роль:", value='%s (#%02x%02x%02x)' % ((u.top_role.name == "@everyone" and "Без роли" or u.top_role.name), r, g, b), inline=True)
-			if kurisu.prefs.Roles.alpaca in u.roles:
+			emb.add_field(name="Основная роль:", value='%s (#%02x%02x%02x)' % (norole and "Без роли" or u.top_role.name, *color), inline=True)
+			if kurisu.prefs.Roles.get('alpaca') in u.roles:
 				conn = sqlite3.connect('db.sqlite3')
 				cursor = conn.cursor()
 				cursor.execute('select * from alpaca where userID = %s limit 1' % u.id)
@@ -166,7 +162,7 @@ class FGL:
 			if len(roles) > 0:
 				emb.add_field(name="Остальные роли", value=", ".join(roles), inline=False)
 			emb.set_thumbnail(url=kurisu.prefs.avatar_url(u))
-			await self.bot.say(embed=emb)
+			await ctx.send(embed=emb)
 
 
 def setup(bot):

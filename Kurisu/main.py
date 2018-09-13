@@ -1,6 +1,7 @@
 import discord, datetime
 
-import kurisu.nyaa, kurisu.tips, kurisu.override, kurisu.alpaca, kurisu.prefs, kurisu.tasks
+import kurisu.nyaa, kurisu.tips, kurisu.override, kurisu.alpaca, kurisu.prefs
+import salieri.tasks
 import requests, signal, sys
 
 from discord.ext import commands
@@ -13,12 +14,12 @@ client = commands.Bot(command_prefix='!', description='Amadeus Systems', formatt
 ready = False
 taskList = {}
 
-fubuki = lambda text, desc: {'embeds': [{'color': '3066993', 'title': text, 'description': desc}]}
+fubuki = lambda text, desc, color: {'embeds': [{'color': color, 'title': text, 'description': desc}]}
 
 
 def sigint_handler(sig, frame):
 	desc = '{u.mention} отключена.'.format(u=client.user)
-	requests.post(kurisu.prefs.webhook, json=fubuki("Ядро Salieri отключено.", desc))
+	requests.post(kurisu.prefs.webhook, json=fubuki("Ядро Salieri отключено.", desc, '15158332'))
 	sys.exit(0)
 
 
@@ -26,7 +27,7 @@ def sigint_handler(sig, frame):
 async def on_ready():
 	global ready
 	if ready:
-		await client.send_message(kurisu.prefs.Channels.dev, "Переподключение...")
+		await kurisu.prefs.Channels.get('dev').send("Переподключение...")
 	else:
 		print('[Discord] | Initializing tips')
 		kurisu.tips.init()
@@ -34,14 +35,14 @@ async def on_ready():
 		kurisu.prefs.discordClient = client
 		kurisu.prefs.init()
 		print('[Discord] | Logged in as: %s | %s' % (client.user.name, client.user.id))
-		await client.change_presence(game=discord.Game(name='Steins;Gate 0', type=3))
-		kurisu.tasks.loop = client.loop
-		await kurisu.tasks.new(kurisu.nyaa.fetch)
-		await kurisu.tasks.new(kurisu.alpaca.alpacaLoop)
+		await client.change_presence(activity=discord.Game(name='тестовый клиент', type=3))
+		salieri.tasks.loop = client.loop
+		await salieri.tasks.new(kurisu.nyaa.fetch)
+		await salieri.tasks.new(kurisu.alpaca.alpacaLoop)
 		kurisu.prefs.startup = datetime.datetime.now()
 
 	desc = '{u.mention} готова к работе.'.format(u=client.user)
-	requests.post(kurisu.prefs.webhook, json=fubuki("Ядро Salieri запущено.", desc))
+	requests.post(kurisu.prefs.webhook, json=fubuki("Ядро Salieri запущено.", desc, '3066993'))
 	ready = True
 
 signal.signal(signal.SIGINT, sigint_handler)
