@@ -1,26 +1,17 @@
 import discord, datetime
 
 import kurisu.nyaa, kurisu.tips, kurisu.override, kurisu.alpaca, kurisu.prefs
-import salieri.tasks
-import requests, signal, sys
-
-from discord.ext import commands
+import salieri.tasks, salieri.core
+import requests
 
 startup_extensions = ["kurisu.cogs.steins", "kurisu.cogs.upa", "kurisu.cogs.fgl", "kurisu.cogs.main"]
 startup_system = ["kurisu.system.messages", "kurisu.system.members"]
 
-client = commands.Bot(command_prefix='!', description='Amadeus Systems', formatter=kurisu.override.newHelpFormatter())
+client = salieri.core.Bot(command_prefix='!', description='Amadeus Systems', formatter=kurisu.override.newHelpFormatter())
 
 ready = False
 taskList = {}
-
 fubuki = lambda text, desc, color: {'embeds': [{'color': color, 'title': text, 'description': desc}]}
-
-
-def sigint_handler(sig, frame):
-	desc = '{u.mention} отключена.'.format(u=client.user)
-	requests.post(kurisu.prefs.webhook, json=fubuki("Ядро Salieri отключено.", desc, '15158332'))
-	sys.exit(0)
 
 
 @client.event
@@ -44,8 +35,6 @@ async def on_ready():
 	desc = '{u.mention} готова к работе.'.format(u=client.user)
 	requests.post(kurisu.prefs.webhook, json=fubuki("Ядро Salieri запущено.", desc, '3066993'))
 	ready = True
-
-signal.signal(signal.SIGINT, sigint_handler)
 
 if __name__ == "__main__":
 	for extension in startup_system:

@@ -20,7 +20,7 @@ class SteinsGate:
 			TIP, который нужно найти.
 		"""
 		tip = ' '.join(tip)
-		await kurisu.tips.search(tip, self.client)
+		await kurisu.tips.search(tip, ctx)
 
 	@commands.command()
 	async def sg0(self, ctx, episode: int):
