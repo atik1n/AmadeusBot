@@ -35,7 +35,7 @@ class Events:
 	async def on_member_remove(self, member):
 		if member.guild != kurisu.prefs.Servers.get('FGL'):
 			return
-		if member not in kurisu.prefs.Servers.get('FGL').members:
+		if kurisu.prefs.ban_check(await kurisu.prefs.Servers.get('FGL').bans(), member):
 			return
 		tmpEmbed = kurisu.prefs.Embeds.new('goodbye')
 		tmpEmbed.set_thumbnail(url=kurisu.prefs.avatar_url(member))
