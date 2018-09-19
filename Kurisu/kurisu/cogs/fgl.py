@@ -27,7 +27,7 @@ class FGL:
 		self.bot = bot
 
 	@commands.command(pass_context=True)
-	async def help(self, ctx, *cmd: str):
+	async def help(self, ctx, *commands: str):
 		"""Показывает данное сообщение"""
 		bot = ctx.bot
 		destination = ctx.message.author if bot.pm_help else ctx.message.channel
@@ -36,32 +36,32 @@ class FGL:
 			return _mentions_transforms.get(obj.group(0), '')
 
 		# help by itself just lists our own commands.
-		if len(cmd) == 0:
+		if len(commands) == 0:
 			helpEmbed = await bot.formatter.format_help_for(ctx, bot)
-		elif len(cmd) == 1:
+		elif len(commands) == 1:
 			# try to see if it is a cog name
-			name = _mention_pattern.sub(repl, cmd[0])
+			name = _mention_pattern.sub(repl, commands[0])
 			command = None
 			if name in bot.cogs:
 				command = bot.cogs[name]
 			else:
-				command = bot.commands.get(name)
+				command = bot.all_commands.get(name)
 				if command is None:
 					await destination.send("Команда %s не найдена." % name)
 					return
 
 			helpEmbed = await bot.formatter.format_help_for(ctx, command)
 		else:
-			name = _mention_pattern.sub(repl, cmd[0])
-			command = bot.commands.get(name)
+			name = _mention_pattern.sub(repl, commands[0])
+			command = bot.all_commands.get(name)
 			if command is None:
 				await destination.send("Команда %s не найдена." % name)
 				return
 
-			for key in cmd[1:]:
+			for key in commands[1:]:
 				try:
 					key = _mention_pattern.sub(repl, key)
-					command = command.commands.get(key)
+					command = command.all_commands.get(key)
 					if command is None:
 						await destination.send("Подкоманда %s не найдена." % key)
 						return

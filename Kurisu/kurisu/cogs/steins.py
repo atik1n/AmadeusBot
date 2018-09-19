@@ -10,6 +10,40 @@ class SteinsGate:
 	def __init__(self, bot):
 		self.client = bot
 
+	@commands.command(name='sub')
+	async def sg_sub(self, ctx):
+		"""Подписка на события, связанные с трансляциями и торрентами S;G 0.
+
+		`Команда не принимает аргументы.`
+		"""
+
+		u = ctx.message.author
+		r = kurisu.prefs.Roles.get('sub')
+
+		if r not in u.roles:
+			await u.add_roles(r, reason='Желание %s' % u.display_name)
+			await ctx.message.channel.send('Вы подписались на уведомления.')
+
+		else:
+			await ctx.message.channel.send('Вы уже подписались на уведомления.')
+
+	@commands.command(name='unsub')
+	async def sg_unsub(self, ctx):
+		"""Отписка от событий, связанных с трансляциями и торрентами S;G 0.
+
+		`Команда не принимает аргументы.`
+		"""
+
+		u = ctx.message.author
+		r = kurisu.prefs.Roles.get('sub')
+
+		if r in u.roles:
+			await u.remove_roles(r, reason='Желание %s' % u.display_name)
+			await ctx.message.channel.send('Вы отписались от уведомлений.')
+
+		else:
+			await ctx.message.channel.send('Вы и так не подписаны на уведомления.')
+
 	@commands.command()
 	async def tips(self, ctx, *tip: str):
 		"""Поиск по TIPS Steins;Gate.

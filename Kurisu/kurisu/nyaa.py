@@ -6,7 +6,7 @@ import kurisu.prefs
 templates = {'HorribleSubs': ['[HorribleSubs] Steins Gate 0 - ', ' [1080p].mkv'], 'Erai-raws': ['[Erai-raws] Steins Gate 0 - ', ' [1080p].mkv']}
 nyaa_dls = ['HorribleSubs', 'Erai-raws']
 
-dsgt = True
+dsgt = False
 
 
 async def getPage(dl):
@@ -27,7 +27,7 @@ async def fetch():
             pt = '%s в %s' % (pt[0], pt[1][:-3])
             dsgtEmbed.set_footer(text='Последнее обновление БД: %s' % pt)
 
-            await channel.send('@here')
+            await channel.send('<@&492018941246570508>')
             await channel.send(embed=dsgtEmbed)
             dsgt = False
 
@@ -45,7 +45,7 @@ async def fetch():
             t = '%s в %s' % (t[0], t[1][:-3])
             nyaaEmbed.set_footer(text = 'Последнее обновление БД: %s' % t)
 
-            await channel.send('@here')
+            await channel.send('<@&492018941246570508>')
             await channel.send(embed=nyaaEmbed)
 
         t = time.localtime()

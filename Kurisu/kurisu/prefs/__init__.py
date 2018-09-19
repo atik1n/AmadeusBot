@@ -93,7 +93,8 @@ class Channels(Objects):
 
 
 class Roles(Objects):
-	startup = [['alpaca', 'FGL', 474224730245955584]]
+	startup = [['alpaca', 'FGL', 474224730245955584],
+				['sub', 'FGL', 492018941246570508]]
 
 
 def init():
