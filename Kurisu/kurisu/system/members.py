@@ -14,6 +14,7 @@ class Events:
 		a = cursor.fetchall()
 
 		tmpEmbed = kurisu.prefs.Embeds.new('welcome')
+		tmpEmbed.title = 'Лабмем №%s присоединился' % str(len(kurisu.prefs.Servers.get('FGL').members))
 		tmpEmbed.set_thumbnail(url=kurisu.prefs.avatar_url(member))
 		tmpEmbed.add_field(name="Никнейм", value=member)
 		tmpEmbed.add_field(name="ID", value=member.id)

@@ -7,7 +7,7 @@ import requests
 startup_extensions = ["kurisu.cogs.steins", "kurisu.cogs.upa", "kurisu.cogs.fgl", "kurisu.cogs.main"]
 startup_system = ["kurisu.system.messages", "kurisu.system.members"]
 
-client = salieri.core.Bot(command_prefix='!', description='Amadeus Systems', formatter=kurisu.override.newHelpFormatter())
+client = salieri.core.Bot(command_prefix='!', description='Salieri Systems', formatter=kurisu.override.newHelpFormatter())
 
 ready = False
 taskList = {}
