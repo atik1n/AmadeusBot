@@ -2,25 +2,23 @@ import asyncio, datetime, sqlite3
 from math import floor
 import kurisu.prefs
 
-ibn = kurisu.prefs.Channels.get('dev')
-alpacaRole = kurisu.prefs.Roles.get('alpaca')
-
 
 async def alpacaLoop():
-	client = kurisu.prefs.discordClient
+	ibn = kurisu.prefs.Channels.get('dev')
+	alpacaRole = kurisu.prefs.Roles.get('alpaca')
+	fgl = kurisu.prefs.Servers.get('FGL')
 	dealp = [False, 0]
 	while True:
 		conn = sqlite3.connect('db.sqlite3')
 		cursor = conn.cursor()
 		if dealp[0]:
 			cursor.execute('delete from alpaca where userID = %s' % dealp[1])
-			s = client.get_server('380104197267521537')
-			u = s.get_member(dealp[1])
+			u = fgl.get_member(int(dealp[1]))
 			try:
-				await client.remove_roles(u, alpacaRole)
-				await ibn.send_message(ibn, "%s больше не Альпакамен." % u.mention)
+				await u.remove_roles(alpacaRole)
+				await ibn.send("%s больше не Альпакамен." % u.mention)
 			except:
-				await ibn.send_message(ibn, "Пользователь с ID %s покинул сервер до снятия роли." % dealp[1])
+				await ibn.send("Пользователь с ID %s покинул сервер до снятия роли." % dealp[1])
 			dealp = [False, '']
 			conn.commit()
 
