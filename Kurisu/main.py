@@ -27,8 +27,12 @@ async def on_ready():
 		kurisu.prefs.init()
 		print('[Salieri] | Initializing core')
 		client.init_core([startup_system, startup_extensions])
+		print('[Salieri] | Clearing Fubuki')
+		await client.clear_webhook(kurisu.prefs.Channels.get('dev'))
 		print('[Discord] | Logged in as: %s | %s' % (client.user.name, client.user.id))
-		await client.change_presence(activity=discord.Game(name='тестовый клиент', type=3))
+		await client.change_presence(activity=discord.Activity(application_id='444126412270600202',
+																name='Steins;Gate 0',
+															   	type=3))
 		salieri.tasks.loop = client.loop
 		await salieri.tasks.new(kurisu.alpaca.alpacaLoop)
 		kurisu.prefs.startup = datetime.datetime.now()

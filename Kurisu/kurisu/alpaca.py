@@ -1,10 +1,15 @@
-import asyncio, datetime, sqlite3
+import asyncio, datetime, sqlite3, random
 from math import floor
 import kurisu.prefs
 
 
 async def alpacaLoop():
-	ibn = kurisu.prefs.Channels.get('dev')
+	gifs = [
+		'https://i.imgur.com/wupSJAh.gif',
+		'https://i.imgur.com/Jjzy14a.gif',
+		'https://i.imgur.com/GvOWc77.gif'
+	]
+	lab = kurisu.prefs.Channels.get('lab')
 	alpacaRole = kurisu.prefs.Roles.get('alpaca')
 	fgl = kurisu.prefs.Servers.get('FGL')
 	dealp = [False, 0]
@@ -16,9 +21,18 @@ async def alpacaLoop():
 			u = fgl.get_member(int(dealp[1]))
 			try:
 				await u.remove_roles(alpacaRole)
-				await ibn.send("%s больше не Альпакамен." % u.mention)
+				tmpEmbed = kurisu.prefs.Embeds.new('welcome')
+				tmpEmbed.set_thumbnail(url=kurisu.prefs.avatar_url(u))
+				tmpEmbed.add_field(name="Никнейм", value=u)
+				tmpEmbed.title = "Альпакамен стал лабмемом"
+				tmpEmbed.set_image(url=random.choice(gifs))
+				await lab.send(embed=tmpEmbed)
 			except:
-				await ibn.send("Пользователь с ID %s покинул сервер до снятия роли." % dealp[1])
+				tmpEmbed = kurisu.prefs.Embeds.new('alert')
+				tmpEmbed.add_field(name="ID", value=dealp[1])
+				tmpEmbed.title = "Альпакамен не смог стать лабмемом"
+				tmpEmbed.set_image(url=random.choice(gifs))
+				await lab.send(embed=tmpEmbed)
 			dealp = [False, '']
 			conn.commit()
 

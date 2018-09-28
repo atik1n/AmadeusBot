@@ -1,5 +1,5 @@
 from discord.ext import commands
-import datetime, sqlite3
+import datetime, sqlite3, random
 import kurisu.prefs, kurisu.check
 import salieri.tasks
 
@@ -76,7 +76,13 @@ class Upa:
 		await u.add_roles(kurisu.prefs.Roles.get('alpaca'))
 		pt = kurisu.prefs.parse_time(end.timetuple())
 		pt = '%s %s' % (pt[0], pt[1])
-		await ctx.send("%s стал Альпакаменом до *%s (МСК)*." % (u.mention, pt))
+		tmpEmbed = kurisu.prefs.Embeds.new('goodbye')
+		tmpEmbed.set_thumbnail(url=kurisu.prefs.avatar_url(u))
+		tmpEmbed.add_field(name="Никнейм", value=u)
+		tmpEmbed.add_field(name="Дата/время до", value=pt)
+		tmpEmbed.title = "Лабмем стал Альпакаменом"
+		tmpEmbed.set_image(url='https://i.imgur.com/YxaYHWy.gif')
+		await kurisu.prefs.Channels.get('lab').send(embed=tmpEmbed)
 		conn.commit()
 		conn.close()
 
@@ -99,7 +105,19 @@ class Upa:
 				return
 			cursor.execute('delete from alpaca where userID = %s' % u.id)
 			await u.remove_roles(kurisu.prefs.Roles.get('alpaca'))
-			await ctx.send("%s больше не Альпакамен." % u.mention)
+
+			gifs = [
+				'https://i.imgur.com/wupSJAh.gif',
+				'https://i.imgur.com/Jjzy14a.gif',
+				'https://i.imgur.com/GvOWc77.gif'
+			]
+
+			tmpEmbed = kurisu.prefs.Embeds.new('welcome')
+			tmpEmbed.set_thumbnail(url=kurisu.prefs.avatar_url(u))
+			tmpEmbed.add_field(name="Никнейм", value=u)
+			tmpEmbed.title = "Альпакамен стал лабмемом"
+			tmpEmbed.set_image(url=random.choice(gifs))
+			await kurisu.prefs.Channels.get('lab').send(embed=tmpEmbed)
 		conn.commit()
 		conn.close()
 

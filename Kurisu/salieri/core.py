@@ -8,7 +8,7 @@ class NoPerms(commands.CheckFailure):
 
 
 class Bot(commands.Bot):
-	fubuki = lambda text, desc, color: {'embeds': [{'color': color, 'title': text, 'description': desc}]}
+	fubuki = lambda self, text, desc, color: {'embeds': [{'color': color, 'title': text, 'description': desc}]}
 
 	def _shut(self):
 		desc = '{u.mention} отключена.'.format(u=kurisu.prefs.discordClient.user)
@@ -29,6 +29,11 @@ class Bot(commands.Bot):
 			except Exception as e:
 				exc = '{}: {}'.format(type(e).__name__, e)
 				print('Failed to load extension {}\n{}'.format(extension, exc))
+
+	async def clear_webhook(self, channel):
+		async for m in channel.history(limit=10):
+			if (m.author.name == 'Fubuki-chan') and (m.author.bot):
+				await m.delete()
 
 	def run(self, *args, **kwargs):
 		is_windows = sys.platform == 'win32'

@@ -1,9 +1,27 @@
-import kurisu.prefs, sqlite3, datetime
+import kurisu.prefs, sqlite3, datetime, random
 
 
 class Events:
 	def __init__(self, bot):
 		self.bot = bot
+		self.gifs = {'join': [
+			'https://i.imgur.com/DcLOkLK.gif',
+			'https://i.imgur.com/kVybxun.gif',
+			'https://i.imgur.com/eqgYNr4.gif'
+		], 'leave':[
+			'https://i.imgur.com/72Al5af.gif',
+			'https://i.imgur.com/YZ8Vf3B.gif',
+			'https://i.imgur.com/kDrO4V7.gif'
+		], 'ban':[
+			'https://i.imgur.com/HC5ZgV0.gif',
+			'https://i.imgur.com/KZXCtFB.gif',
+			'https://i.imgur.com/N0zj21G.gif'
+		], 'unban':
+		[
+			'https://i.imgur.com/wupSJAh.gif',
+			'https://i.imgur.com/Jjzy14a.gif',
+			'https://i.imgur.com/GvOWc77.gif'
+		]}
 
 	async def on_member_join(self, member):
 		if member.guild != kurisu.prefs.Servers.get('FGL'):
@@ -29,7 +47,7 @@ class Events:
 				tmpEmbed.add_field(name="Альпакамен", value="Роль снята")
 				cursor.execute('delete from alpaca where userID = %s' % member.id)
 				conn.commit()
-		tmpEmbed.set_image(url="https://i.imgur.com/DcLOkLK.gif")
+		tmpEmbed.set_image(url=random.choice(self.gifs['join']))
 		await kurisu.prefs.Channels.get('lab').send(embed=tmpEmbed)
 		conn.close()
 
@@ -42,7 +60,7 @@ class Events:
 		tmpEmbed.set_thumbnail(url=kurisu.prefs.avatar_url(member))
 		tmpEmbed.add_field(name="Никнейм", value=member)
 		tmpEmbed.add_field(name="ID", value=member.id)
-		tmpEmbed.set_image(url="https://i.imgur.com/72Al5af.gif")
+		tmpEmbed.set_image(url=random.choice(self.gifs['leave']))
 		await kurisu.prefs.Channels.get('lab').send(embed=tmpEmbed)
 
 	async def on_member_ban(self, guild, user):
@@ -54,7 +72,7 @@ class Events:
 		tmpEmbed.add_field(name="Никнейм", value=user)
 		tmpEmbed.add_field(name="ID", value=user.id)
 		tmpEmbed.add_field(name="Причина", value=kurisu.prefs.ban_check(await kurisu.prefs.Servers.get('FGL').bans(), user)[0].reason)
-		tmpEmbed.set_image(url="https://i.imgur.com/HC5ZgV0.gif")
+		tmpEmbed.set_image(url=random.choice(self.gifs['ban']))
 		await kurisu.prefs.Channels.get('lab').send(embed=tmpEmbed)
 
 	async def on_member_unban(self, guild, user):
@@ -65,7 +83,7 @@ class Events:
 		tmpEmbed.set_thumbnail(url=kurisu.prefs.avatar_url(user))
 		tmpEmbed.add_field(name="Никнейм", value=user)
 		tmpEmbed.add_field(name="ID", value=user.id)
-		tmpEmbed.set_image(url="https://i.imgur.com/wupSJAh.gif")
+		tmpEmbed.set_image(url=random.choice(self.gifs['unban']))
 		await kurisu.prefs.Channels.get('lab').send(embed=tmpEmbed)
 
 
