@@ -46,7 +46,7 @@ startup = None
 
 class Objects:
 	@classmethod
-	def get(cls, name):
+	def get(cls, name: str):
 		try:
 			return getattr(cls, name)
 		except AttributeError:
@@ -73,12 +73,14 @@ class Embeds:
 
 	SG0 = discord.Embed(colour=discord.Colour.dark_red())
 
-	def new(name):
+	@classmethod
+	def new(cls, name: str):
 		try:
-			return copy.deepcopy(getattr(Embeds, name))
+			return copy.deepcopy(getattr(cls, name))
 		except:
 			return False
 
+	@staticmethod
 	def all():
 		attributes = inspect.getmembers(Embeds, lambda a: not(inspect.isroutine(a)))
 		return [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
@@ -94,7 +96,9 @@ class Channels(Objects):
 
 class Roles(Objects):
 	startup = [['alpaca', 'FGL', 474224730245955584],
-				['sub', 'FGL', 492018941246570508]]
+				['sub', 'FGL', 492018941246570508],
+			   	['RP', 'FGL', 494963296815022100],
+			   	['dev', 'FGL', 483665377914781716]]
 
 
 def init():

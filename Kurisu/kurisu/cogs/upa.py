@@ -1,6 +1,6 @@
 from discord.ext import commands
 import datetime, sqlite3
-import kurisu.prefs
+import kurisu.prefs, kurisu.check
 import salieri.tasks
 
 
@@ -15,11 +15,9 @@ class Upa:
 		self.bot = bot
 
 	@commands.group()
+	@kurisu.check.is_upa()
 	async def alpaca(self, ctx):
 		"""Временный мут"""
-		if not kurisu.prefs.Channels.get('lab').permissions_for(ctx.author).view_audit_log:
-			await ctx.send("Ты не можешь это сделать, ты не модератор/администратор.")
-			return
 		if ctx.invoked_subcommand is None:
 			await ctx.send('У `!alpaca` нет подкоманды %s. Посмотри `!help alpaca`.' % ctx.subcommand_passed)
 

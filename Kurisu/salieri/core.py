@@ -3,6 +3,10 @@ import signal, asyncio, sys, requests
 import kurisu.prefs
 
 
+class NoPerms(commands.CheckFailure):
+	pass
+
+
 class Bot(commands.Bot):
 	fubuki = lambda text, desc, color: {'embeds': [{'color': color, 'title': text, 'description': desc}]}
 
@@ -10,6 +14,21 @@ class Bot(commands.Bot):
 		desc = '{u.mention} отключена.'.format(u=kurisu.prefs.discordClient.user)
 		requests.post(kurisu.prefs.webhook, json=self.fubuki("Ядро Salieri отключено.", desc, '15158332'))
 		self._do_cleanup()
+
+	def init_core(self, startup):
+		for extension in startup[0]:
+			try:
+				self.load_extension(extension)
+			except Exception as e:
+				exc = '{}: {}'.format(type(e).__name__, e)
+				print('Failed to load system extension {}\n{}'.format(extension, exc))
+
+		for extension in startup[1]:
+			try:
+				self.load_extension(extension)
+			except Exception as e:
+				exc = '{}: {}'.format(type(e).__name__, e)
+				print('Failed to load extension {}\n{}'.format(extension, exc))
 
 	def run(self, *args, **kwargs):
 		is_windows = sys.platform == 'win32'

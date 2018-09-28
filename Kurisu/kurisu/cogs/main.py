@@ -3,6 +3,7 @@ import salieri.tasks, discord, importlib, importlib.util, asyncio, random, datet
 import kurisu.prefs
 from sys import modules
 from math import floor
+import kurisu.check
 
 
 class Amadeus:
@@ -36,11 +37,9 @@ class Amadeus:
 			await ctx.send(random.choice(troll))
 
 	@commands.group()
+	@kurisu.check.is_senpai()
 	async def cog(self, ctx):
 		"""Управление зубцами"""
-		if ctx.message.author.id != 185459415514742784:
-			await ctx.send("Ты не можешь это сделать, ты не сенпай.")
-			return
 		if ctx.invoked_subcommand is None:
 			if ctx.subcommand_passed is None:
 				mods = [i for i in modules if (i.startswith('kurisu.cogs.') or i.startswith('kurisu.system.'))]
@@ -140,11 +139,9 @@ class Amadeus:
 		await ctx.send("Зубец {} отключен.".format(ext))
 
 	@commands.group()
+	@kurisu.check.is_senpai()
 	async def module(self, ctx):
 		"""Управление модулями"""
-		if ctx.message.author.id != 185459415514742784:
-			await ctx.send("Ты не можешь это сделать, ты не сенпай.")
-			return
 		if ctx.invoked_subcommand is None:
 			if ctx.subcommand_passed is None:
 				mods = [i for i in modules if (i.startswith('kurisu.') and not (i.startswith('kurisu.cogs') or i.startswith('kurisu.system.')))]
@@ -373,7 +370,8 @@ class Amadeus:
 
 			await mess.edit(embed=emb)
 			return
-			await m.delete()
+
+		await m.delete()
 
 		m = getattr(globals()['kurisu'], module)
 		mPath = m.__name__
@@ -430,11 +428,9 @@ class Amadeus:
 		await mess.edit(embed=emb)
 
 	@commands.group()
+	@kurisu.check.is_senpai()
 	async def task(self, ctx):
 		"""Управление задачами"""
-		if ctx.message.author.id != 185459415514742784:
-			await ctx.send("Ты не можешь это сделать, ты не сенпай.")
-			return
 		if ctx.invoked_subcommand is None:
 			if ctx.subcommand_passed is None:
 				embed = discord.Embed(colour = discord.Colour.dark_red())

@@ -1,5 +1,6 @@
 from discord.ext import commands
 import kurisu.prefs, traceback
+import salieri.core
 
 
 class Events:
@@ -24,16 +25,18 @@ class Events:
 		tmpEmbed.add_field(name="Вызвал", value=ctx.message.author.mention)
 		tmpEmbed.add_field(name="Сообщение", value=ctx.message.content)
 		tmpEmbed.add_field(name="Traceback", value='%s%s' % (''.join(tb[:5]), ''.join(tb[-1])))
-		await kurisu.prefs.Channels.get('log').send(embed=tmpEmbed)
 
 		if isinstance(error, commands.BadArgument):
-			await ctx.message.channel.send('Ошибка в аргументе')
+			await ctx.send('Ошибка в аргументе')
 			return
 		elif isinstance(error, commands.MissingRequiredArgument):
-			await ctx.message.channel.send('Недостаточно аргументов')
+			await ctx.send('Недостаточно аргументов')
 			return
+		elif isinstance(error, salieri.core.NoPerms):
+			await ctx.send(error)
 		else:
-			await ctx.message.channel.send('Упс... Информация об ошибке в %s' % kurisu.prefs.Channels.log.mention)
+			await ctx.send('Упс... Информация об ошибке в %s' % kurisu.prefs.Channels.log.mention)
+			await kurisu.prefs.Channels.get('log').send(embed=tmpEmbed)
 
 
 def setup(bot):

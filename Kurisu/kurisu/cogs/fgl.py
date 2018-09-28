@@ -28,7 +28,7 @@ class FGL:
 
 	@commands.command(pass_context=True)
 	async def help(self, ctx, *commands: str):
-		"""Показывает данное сообщение"""
+		"""Возвращает данное сообщение"""
 		bot = ctx.bot
 		destination = ctx.message.author if bot.pm_help else ctx.message.channel
 
