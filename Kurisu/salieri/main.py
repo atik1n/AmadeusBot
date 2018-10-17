@@ -184,8 +184,11 @@ class Amadeus:
 
 		def check(m):
 			return (m.content.lower() in ['д', 'н', 'да', 'нет', 'yes', 'no', 'y', 'n']) and (ctx.message.author == m.author)
+		try:
+			m = await self.bot.wait_for('message', check=check, timeout=10)
+		except asyncio.TimeoutError:
+			m = None
 
-		m = await self.bot.wait_for('message', check=check, timeout=10)
 		if m is None:
 			emb.clear_fields()
 			emb.colour = discord.Colour.red()
@@ -246,7 +249,11 @@ class Amadeus:
 		def check(m):
 			return (m.content.lower() in ['д', 'н', 'да', 'нет', 'yes', 'no', 'y', 'n']) and (ctx.message.author == m.author)
 
-		m = await self.bot.wait_for('message', check=check, timeout=10)
+		try:
+			m = await self.bot.wait_for('message', check=check, timeout=10)
+		except asyncio.TimeoutError:
+			m = None
+
 		if (m is None) or (m.content.lower() in ['n', 'н', 'no', 'нет']):
 			emb.clear_fields()
 			emb.colour = discord.Colour.red()
@@ -356,7 +363,11 @@ class Amadeus:
 		def check(m):
 			return (m.content.lower() in ['д', 'н', 'да', 'нет', 'yes', 'no', 'y', 'n']) and (ctx.message.author == m.author)
 
-		m = await self.bot.wait_for('message', check=check, timeout=10)
+		try:
+			m = await self.bot.wait_for('message', check=check, timeout=10)
+		except asyncio.TimeoutError:
+			m = None
+
 		if (m is None) or (m.content.lower() in ['n', 'н', 'no', 'нет']):
 			emb.clear_fields()
 			emb.colour = discord.Colour.red()
