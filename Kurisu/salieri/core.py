@@ -15,6 +15,13 @@ class Bot(commands.Bot):
 		requests.post(kurisu.prefs.webhook, json=self.fubuki("Ядро Salieri отключено.", desc, '15158332'))
 		self._do_cleanup()
 
+	@staticmethod
+	def log(name, text):
+		if len(name) > 8:
+			name = name[:8]
+
+		print('[%s] | %s' % (name.ljust(8), text))
+
 	def init_core(self, startup):
 		for extension in startup[0]:
 			try:
@@ -32,7 +39,7 @@ class Bot(commands.Bot):
 
 	async def clear_webhook(self, channel):
 		async for m in channel.history(limit=10):
-			if (m.author.name == 'Fubuki-chan') and (m.author.bot):
+			if (m.author.name == 'Fubuki-chan') and m.author.bot:
 				await m.delete()
 
 	def run(self, *args, **kwargs):

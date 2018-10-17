@@ -4,7 +4,7 @@ import kurisu.nyaa, kurisu.tips, kurisu.override, kurisu.alpaca, kurisu.prefs
 import salieri.tasks, salieri.core
 import requests
 
-startup_extensions = ["kurisu.cogs.steins", "kurisu.cogs.upa", "kurisu.cogs.fgl", "kurisu.cogs.main", "kurisu.cogs.rp"]
+startup_extensions = ["kurisu.cogs.steins", "kurisu.cogs.upa", "kurisu.cogs.fgl", "salieri.main", "kurisu.cogs.rp"]
 startup_system = ["kurisu.system.messages", "kurisu.system.members"]
 
 client = salieri.core.Bot(command_prefix='!', description='Salieri Systems', formatter=kurisu.override.newHelpFormatter())
@@ -20,16 +20,16 @@ async def on_ready():
 	if ready:
 		await kurisu.prefs.Channels.get('dev').send("Переподключение...")
 	else:
-		print('[Discord] | Initializing tips')
+		client.log('Discord', 'Initializing tips')
 		kurisu.tips.init()
-		print('[Discord] | Initializing preferences')
+		client.log('Discord', 'Initializing preferences')
 		kurisu.prefs.discordClient = client
 		kurisu.prefs.init()
-		print('[Salieri] | Initializing core')
+		client.log('Salieri', 'Initializing core')
 		client.init_core([startup_system, startup_extensions])
-		print('[Salieri] | Clearing Fubuki')
+		client.log('Salieri', 'Clearing Fubuki')
 		await client.clear_webhook(kurisu.prefs.Channels.get('dev'))
-		print('[Discord] | Logged in as: %s | %s' % (client.user.name, client.user.id))
+		client.log('Discord', 'Logged in as: %s | %s' % (client.user.name, client.user.id))
 		await client.change_presence(activity=discord.Activity(application_id='444126412270600202',
 																name='Steins;Gate 0',
 															   	type=3))

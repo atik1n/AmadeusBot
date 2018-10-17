@@ -44,7 +44,7 @@ async def alpacaLoop():
 			if r <= 60:
 				dealp = [True, str(a[0][1])]
 				dt = r
-				print(r)
+				kurisu.prefs.discordClient.log('Alpaca', 'Next unalpaca: %s' % r)
 			else:
 				dt = 60
 		else:

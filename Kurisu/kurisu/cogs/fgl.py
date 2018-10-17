@@ -101,57 +101,84 @@ class FGL:
 			users = ctx.message.mentions
 
 		for u in users:
+			conn = sqlite3.connect('db.sqlite3')
+			cursor = conn.cursor()
 			emb = kurisu.prefs.Embeds.new('normal')
 			norole = u.top_role.name == "@everyone"
 			color = (255, 255, 255) if norole else u.colour.to_rgb()
 			emb.colour = discord.Colour.from_rgb(*color)
 			emb.title = '%s%s%s' % (u,  "" if (u.name == u.display_name) else (" a.k.a %s" % u.display_name), u.bot and " [BOT]" or '')
 			emb.add_field(name="ID:", value=u.id, inline=False)
-			embDays = (datetime.datetime.now() - u.joined_at).days
 
-			def isYa(num):
-				return (num%10 > 1) and (num%10 < 5) and ((num//10 == 0) or (num//10 > 1))
+			if not u.bot:
+				cursor.execute('select * from committee where userID = %s limit 1' % u.id)
+				a = cursor.fetchall()
 
-			def dateParse(days):
-				res = ''
-				years, days = days//365, days%365
-				if years > 0:
-					if years == 1:
-						res = "1 год"
-					elif (years > 1) and (years < 5):
-						res = "%s года" % years
-					else:
-						res = "%s лет" % years
-				months, days = days//30, days%30
-				if months > 0:
-					if months == 1:
-						res = ', '.join([res, "1 месяц"])
-					elif isYa(months):
-						res = ', '.join([res, "%s месяца" % months])
-					else:
-						res = ', '.join([res, "%s месяцев" % months])
-				if days > 0:
-					if days == 1:
-						res = ', '.join([res, "1 день"])
-					elif isYa(days):
-						res = ', '.join([res, "%s дня" % days])
-					else:
-						res = ', '.join([res, "%s дней" % days])
+				if a:
+					join_date = datetime.datetime.fromtimestamp(a[0][2])
+					emb.description = "Член Комитета №%s" % a[0][1]
 
-				if res.startswith(', '):
-					res = res[2:]
+				else:
+					cursor.execute('select * from labmembers where userID = %s limit 1' % u.id)
+					a = cursor.fetchall()
+					if a:
+						join_date = datetime.datetime.fromtimestamp(a[0][2])
+						emb.description = "Лабмембер №%s" % a[0][0]
+					else:
+						join_date = datetime.datetime.now()
+						emb.description = "Лабмембер №`<N/A>`"
+
+				embDays = (datetime.datetime.now() - join_date).days
+
+				def isYa(num):
+					return (num%10 > 1) and (num%10 < 5) and ((num//10 == 0) or (num//10 > 1))
+
+				def dateParse(days):
+					res = ''
+					years, days = days//365, days%365
+					if years > 0:
+						if years == 1:
+							res = "1 год"
+						elif (years > 1) and (years < 5):
+							res = "%s года" % years
+						else:
+							res = "%s лет" % years
+					months, days = days//30, days%30
+					if months > 0:
+						if months == 1:
+							res = ', '.join([res, "1 месяц"])
+						elif isYa(months):
+							res = ', '.join([res, "%s месяца" % months])
+						else:
+							res = ', '.join([res, "%s месяцев" % months])
+					if days > 0:
+						if days == 1:
+							res = ', '.join([res, "1 день"])
+						elif isYa(days):
+							res = ', '.join([res, "%s дня" % days])
+						else:
+							res = ', '.join([res, "%s дней" % days])
+
 					if res.startswith(', '):
 						res = res[2:]
+						if res.startswith(', '):
+							res = res[2:]
 
-				if res == '':
-					res = 'Ни одного дня'
-				return res
+					if res == '':
+						res = 'Ни одного дня'
+					return res
 
-			emb.add_field(name="На сервере:", value=dateParse(embDays), inline=False)
+				emb.add_field(name="На сервере:", value=dateParse(embDays), inline=False)
+			else:
+				cursor.execute('select * from labbots where botID = %s limit 1' % u.id)
+				a = cursor.fetchall()
+				if a:
+					emb.description = "Бот №%s" % a[0][1]
+				else:
+					emb.description = "Бот №`<N/A>`"
+
 			emb.add_field(name="Основная роль:", value='%s (#%02x%02x%02x)' % (norole and "Без роли" or u.top_role.name, *color), inline=True)
 			if kurisu.prefs.Roles.get('alpaca') in u.roles:
-				conn = sqlite3.connect('db.sqlite3')
-				cursor = conn.cursor()
 				cursor.execute('select * from alpaca where userID = %s limit 1' % u.id)
 				a = cursor.fetchall()
 				t = datetime.datetime.fromtimestamp(a[0][2]) - datetime.timedelta(hours=3)
@@ -163,6 +190,8 @@ class FGL:
 				emb.add_field(name="Остальные роли", value=", ".join(roles), inline=False)
 			emb.set_thumbnail(url=kurisu.prefs.avatar_url(u))
 			await ctx.send(embed=emb)
+
+			conn.close()
 
 
 def setup(bot):

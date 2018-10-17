@@ -32,11 +32,25 @@ class Events:
 		a = cursor.fetchall()
 
 		tmpEmbed = kurisu.prefs.Embeds.new('welcome')
-		tmpEmbed.title = 'Лабмем №%s присоединился' % str(len(kurisu.prefs.Servers.get('FGL').members))
+
+		cursor.execute('select * from labmembers where userID = %s limit 1' % member.id)
+		b = cursor.fetchall()
+		if b:
+			labmember = b[0][0]
+			tmpEmbed.title = 'Лабмем №%s вернулся' % labmember
+		else:
+			cursor.execute('select * from labmembers order by number desc limit 1')
+			b = cursor.fetchall()
+			labmember = b[0][0] + 1
+
+			cursor.execute('insert into labmembers (userID, number, join_date) values (%s, %s, %s)' % (member.id, labmember, member.joined_at.timestamp()))
+			tmpEmbed.title = 'Лабмем №%s присоединился' % labmember
+			conn.commit()
+
 		tmpEmbed.set_thumbnail(url=kurisu.prefs.avatar_url(member))
 		tmpEmbed.add_field(name="Никнейм", value=member)
 		tmpEmbed.add_field(name="ID", value=member.id)
-		if len(a) != 0:
+		if a:
 			t = datetime.datetime.fromtimestamp(a[0][2]) - datetime.timedelta(hours=3)
 			if t > datetime.datetime.now():
 				pt = kurisu.prefs.parse_time(t.timetuple())
@@ -73,6 +87,13 @@ class Events:
 		tmpEmbed.add_field(name="ID", value=user.id)
 		tmpEmbed.add_field(name="Причина", value=kurisu.prefs.ban_check(await kurisu.prefs.Servers.get('FGL').bans(), user)[0].reason)
 		tmpEmbed.set_image(url=random.choice(self.gifs['ban']))
+
+		conn = sqlite3.connect('db.sqlite3')
+		cursor = conn.cursor()
+		cursor.execute('delete from labmembers where userID = %s' % user.id)
+		conn.commit()
+		conn.close()
+
 		await kurisu.prefs.Channels.get('lab').send(embed=tmpEmbed)
 
 	async def on_member_unban(self, guild, user):
