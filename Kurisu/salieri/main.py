@@ -1,12 +1,12 @@
 from discord.ext import commands
-import salieri.tasks, discord, importlib, importlib.util, asyncio, random, datetime, requests
+import salieri.tasks, discord, importlib, importlib.util, asyncio, random, datetime, requests, traceback
 import kurisu.prefs
 from sys import modules
 from math import floor
 import kurisu.check
 
 
-class Amadeus:
+class Amadeus(commands.Cog, name='Amadeus systems'):
 	"""Команды, доступные только <@185459415514742784>."""
 	fuckoff = None
 
@@ -106,7 +106,10 @@ class Amadeus:
 
 			self.bot.load_extension(ext)
 		except (AttributeError, ImportError) as e:
-			await ctx.send("Произошла ошибка во время подключения {} .".format(ext))
+			await ctx.send("Произошла ошибка во время подключения {}.".format(ext))
+
+			tb = traceback.format_exception(etype=type(e), value=e, tb=e.__traceback__, limit=5)
+			await ctx.send('%s%s' % (''.join(tb[:5]), ''.join(tb[-1])))
 			return
 
 		await ctx.send("Зубец {} подключен.".format(ext))
@@ -300,6 +303,7 @@ class Amadeus:
 				return
 
 		try:
+			print(m)
 			importlib.reload(m)
 			embout.append("Модуль `%s` перезагружен." % mPath)
 			emb.set_field_at(0, name='Вывод', value='```\n%s\n```' % '\n'.join(embout))

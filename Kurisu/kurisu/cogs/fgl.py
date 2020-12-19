@@ -20,26 +20,26 @@ def cache_size():
 		return "недоступен"
 
 
-class FGL:
+class FGL(commands.Cog, name='FGL Cog'):
 	"""Просто все подряд, десу"""
 
 	def __init__(self, bot):
 		self.bot = bot
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def help(self, ctx, *commands: str):
 		"""Возвращает данное сообщение"""
 		bot = ctx.bot
-		destination = ctx.message.author if bot.pm_help else ctx.message.channel
+		destination = ctx.message.channel
 
 		def repl(obj):
 			return _mentions_transforms.get(obj.group(0), '')
 
-		# help by itself just lists our own commands.
+		#help by itself just lists our own commands.
 		if len(commands) == 0:
 			helpEmbed = await bot.formatter.format_help_for(ctx, bot)
 		elif len(commands) == 1:
-			# try to see if it is a cog name
+			#try to see if it is a cog name
 			name = _mention_pattern.sub(repl, commands[0])
 			command = None
 			if name in bot.cogs:
@@ -79,9 +79,10 @@ class FGL:
 		stats = kurisu.prefs.info()
 
 		emb = kurisu.prefs.Embeds.new('normal')
-		emb.add_field(name='Статистика', value='CPU: {d[0]}%\nRAM Total: {d[1]}MB\nRAM Used: {d[2]}MB\nTemp: {d[4]}`C\nUptime: {d[5]}'.format(d=stats))
-
-		emb.add_field(name='Моэка', value='Кэш: %s' % cache_size())
+		emb.add_field(name=kurisu.prefs.i18n(self, 'stats'),
+    	value='CPU All: {d[0]}\nCPU 1: {d[1][0]}\nCPU 2: {d[1][1]}\nCPU 3: {d[1][2]}\nCPU 4: {d[1][3]}\nRAM Total: {d[2]}MB\nRAM Used: {d[3]}MB\nTemp: {d[5]}`C\nUptime: {d[6]}'.format(d=stats))
+		emb.add_field(name=kurisu.prefs.i18n(self, 'bot'), value=kurisu.prefs.i18n(self, 'root') % self.bot.root_folder)
+		emb.add_field(name=kurisu.prefs.i18n(self, 'moeka'), value=kurisu.prefs.i18n(self, 'cache') % cache_size())
 
 		await ctx.send(embed=emb)
 

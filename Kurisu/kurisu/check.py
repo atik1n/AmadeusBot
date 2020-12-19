@@ -7,7 +7,10 @@ from discord.ext import commands
 def is_upa():
 	async def pred(ctx):
 		if kurisu.prefs.Roles.get('dev') not in ctx.author.roles:
-			raise salieri.core.NoPerms('Ты не можешь это сделать, ты не модератор/администратор.')
+			if ctx.author.guild_permissions.administrator:
+				return True
+			else:
+				raise salieri.core.NoPerms('Ты не можешь это сделать, ты не модератор/администратор.')
 		else:
 			return True
 

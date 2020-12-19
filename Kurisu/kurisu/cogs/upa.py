@@ -8,7 +8,7 @@ def unixTime(dt):
 	return (dt - datetime.datetime(1970, 1, 1)).total_seconds()
 
 
-class Upa:
+class Upa(commands.Cog, name='zalUPA'):
 	"""Команды, доступные только администраторам и модераторам"""
 
 	def __init__(self, bot):
@@ -22,7 +22,7 @@ class Upa:
 			await ctx.send('У `!alpaca` нет подкоманды %s. Посмотри `!help alpaca`.' % ctx.subcommand_passed)
 
 	@alpaca.command()
-	async def add(self, ctx, user: str, *time: str):
+	async def add(self, ctx, user: str, time: str, *reas):
 		"""Делает пользователя Альпакаменом
 
 		Аргументы:
@@ -32,9 +32,10 @@ class Upa:
 		time : `str`
 			Время, на которое пользователь станет Альпакаменом. По дефолту 2 года.
 			Минимум: 2 минуты. Максимум: 2 года.
-			Формат: "??s ??m ??h" или "??с ??м ??ч". Пожалуйста, не используйте их вместе.
+			Формат: "??s:??m:??h" или "??с:??м:??ч". Пожалуйста, не используйте их вместе.
 			Интересный факт. 2 года ~ 17520 часов.
 		"""
+		reas = ' '.join(reas)
 		user = user.replace('!', '')
 		if not kurisu.prefs.Channels.get('lab').permissions_for(ctx.author).view_audit_log:
 			return
@@ -45,6 +46,7 @@ class Upa:
 
 		now = datetime.datetime.now()
 		end = now
+		time = time.split(':')
 		if len(time) == 0:
 			time = ['17520h']
 
@@ -73,11 +75,12 @@ class Upa:
 		conn = sqlite3.connect('db.sqlite3')
 		cursor = conn.cursor()
 		cursor.execute('insert into alpaca (userID, date) values (%s, %s)' % (u.id, unixTime(end)))
-		await u.add_roles(kurisu.prefs.Roles.get('alpaca'))
+		await u.add_roles(kurisu.prefs.Roles.get('alpaca'), reason=str(reas))
 		pt = kurisu.prefs.parse_time(end.timetuple())
 		pt = '%s %s' % (pt[0], pt[1])
 		tmpEmbed = kurisu.prefs.Embeds.new('goodbye')
 		tmpEmbed.set_thumbnail(url=kurisu.prefs.avatar_url(u))
+		tmpEmbed.add_field(name="Причина", value=reas, inline=False)
 		tmpEmbed.add_field(name="Никнейм", value=u)
 		tmpEmbed.add_field(name="Дата/время до", value=pt)
 		tmpEmbed.title = "Лабмем стал Альпакаменом"

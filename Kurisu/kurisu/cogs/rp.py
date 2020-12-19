@@ -4,7 +4,7 @@ from discord.ext import commands
 import kurisu.check
 
 
-class RolePlay:
+class RolePlay(commands.Cog, name='ERP Core'):
 	"""Команды, связанные с ролплеем"""
 
 	def __init__(self, bot):

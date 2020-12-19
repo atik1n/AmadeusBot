@@ -6,7 +6,7 @@ import kurisu.prefs
 templates = {'HorribleSubs': ['[HorribleSubs] Steins Gate 0 - ', ' [1080p].mkv'], 'Erai-raws': ['[Erai-raws] Steins Gate 0 - ', ' [1080p].mkv']}
 nyaa_dls = ['HorribleSubs', 'Erai-raws']
 
-dsgt = False
+dsgt = True
 
 
 async def getPage(dl):

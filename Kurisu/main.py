@@ -1,18 +1,40 @@
 import discord, datetime
+from discord.ext import commands
 
-import kurisu.nyaa, kurisu.tips, kurisu.override, kurisu.alpaca, kurisu.prefs
+import kurisu.nyaa, kurisu.tips, kurisu.alpaca, kurisu.prefs
 import salieri.tasks, salieri.core
 import requests
 
-startup_extensions = ["kurisu.cogs.steins", "kurisu.cogs.upa", "kurisu.cogs.fgl", "salieri.main", "kurisu.cogs.rp"]
-startup_system = ["kurisu.system.messages", "kurisu.system.members"]
+startup_extensions = ["kurisu.cogs.steins", "kurisu.cogs.upa", "kurisu.cogs.fgl", "salieri.main", "kurisu.cogs.rnd"]
+startup_system = ["kurisu.system.messages"]
 
-client = salieri.core.Bot(command_prefix='!', description='Salieri Systems', formatter=kurisu.override.newHelpFormatter())
+client = commands.Bot(command_prefix='!', description='Salieri Systems')
+#client.root_folder = 'kurisu'
 
 ready = False
 taskList = {}
 fubuki = lambda text, desc, color: {'embeds': [{'color': color, 'title': text, 'description': desc}]}
 
+def log(name, text):
+	if len(name) > 8:
+		name = name[:8]
+
+	print('[%s] | %s' % (name.ljust(8), text))
+  
+def init_core(client, startup):
+		for extension in startup[0]:
+			try:
+				client.load_extension(extension)
+			except Exception as e:
+				exc = '{}: {}'.format(type(e).__name__, e)
+				print('Failed to load system extension {}\n{}'.format(extension, exc))
+
+		for extension in startup[1]:
+			try:
+				client.load_extension(extension)
+			except Exception as e:
+				exc = '{}: {}'.format(type(e).__name__, e)
+				print('Failed to load extension {}\n{}'.format(extension, exc))
 
 @client.event
 async def on_ready():
@@ -20,16 +42,16 @@ async def on_ready():
 	if ready:
 		await kurisu.prefs.Channels.get('dev').send("Переподключение...")
 	else:
-		client.log('Discord', 'Initializing tips')
+		log('Discord', 'Initializing tips')
 		kurisu.tips.init()
-		client.log('Discord', 'Initializing preferences')
+		log('Discord', 'Initializing preferences')
 		kurisu.prefs.discordClient = client
 		kurisu.prefs.init()
-		client.log('Salieri', 'Initializing core')
-		client.init_core([startup_system, startup_extensions])
-		client.log('Salieri', 'Clearing Fubuki')
-		await client.clear_webhook(kurisu.prefs.Channels.get('dev'))
-		client.log('Discord', 'Logged in as: %s | %s' % (client.user.name, client.user.id))
+		log('Salieri', 'Initializing core')
+		init_core(client, [startup_system, startup_extensions])
+		#client.log('Salieri', 'Clearing Fubuki')
+		#await client.clear_webhook(kurisu.prefs.Channels.get('dev'))
+		log('Discord', 'Logged in as: %s | %s' % (client.user.name, client.user.id))
 		await client.change_presence(activity=discord.Activity(application_id='444126412270600202',
 																name='Steins;Gate 0',
 															   	type=3))

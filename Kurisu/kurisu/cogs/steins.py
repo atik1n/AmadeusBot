@@ -3,7 +3,7 @@ import sqlite3, time, os.path
 from discord.ext import commands
 
 
-class SteinsGate:
+class SteinsGate(commands.Cog, name='Штаны Гея'):
 	"""Команды, связанные с Steins;Gate"""
 	client = None
 

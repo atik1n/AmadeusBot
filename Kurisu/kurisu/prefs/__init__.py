@@ -31,10 +31,11 @@ def avatar_url(member):
 
 def info():
 	info = []
-	info.append(str(round(float(os.popen('''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),2)))
+	info.append('%.2f' % psutil.cpu_percent())
+	info.append(['%.2f' % perc for perc in psutil.cpu_percent(percpu=True)])
 	info.extend(map(str, os.popen('free -t -m').readlines()[-1].split()[1:]))
 	info.append(os.popen('vcgencmd measure_temp').readline())
-	info[4] = info[4][info[4].index('=') + 1:info[4].rindex("'")]
+	info[5] = info[5][info[5].index('=') + 1:info[5].rindex("'")]
 	info.append(parse_delta(datetime.datetime.now()-startup))
 
 	return info
@@ -42,6 +43,13 @@ def info():
 
 discordClient = None
 startup = None
+
+locale = 'ru'
+supported_locales = ['ru', 'eng']
+
+def i18n(call, text):
+	return discordClient.i18n_get(call.__module__, locale, text)
+
 
 
 class Objects:
@@ -54,7 +62,7 @@ class Objects:
 
 
 class Servers(Objects):
-	startup = [['FGL', 380104197267521537]]
+	startup = []
 
 
 class Embeds:
@@ -87,18 +95,11 @@ class Embeds:
 
 
 class Channels(Objects):
-	startup = [['news', 'FGL', 430365781721743362],
-				['lab', 'FGL', 380104197837815811],
-				['log', 'FGL', 474683293304881175],
-				['shower', 'FGL', 446333540381229066],
-				['dev', 'FGL', 475059718562250752]]
+	startup = []
 
 
 class Roles(Objects):
-	startup = [['alpaca', 'FGL', 474224730245955584],
-				['sub', 'FGL', 492018941246570508],
-			   	['RP', 'FGL', 494963296815022100],
-			   	['dev', 'FGL', 483665377914781716]]
+	startup = []
 
 
 def init():
@@ -108,8 +109,8 @@ def init():
 	for c in Channels.startup:
 		setattr(Channels, c[0], getattr(Servers, c[1]).get_channel(c[2]))
 
-	for r in Roles.startup:
-		setattr(Roles, r[0], [x for x in getattr(Servers, r[1]).roles if x.id == r[2]][0])
+	#for r in Roles.startup:
+		#setattr(Roles, r[0], [x for x in getattr(Servers, r[1]).roles if x.id == r[2]][0])
 
 	for e in Embeds.all():
 		e[1].set_author(name="Salieri Systems", icon_url="https://pp.userapi.com/c831209/v831209232/15d24c/tA_XzT7cXYA.jpg")
